@@ -19,6 +19,15 @@ namespace Tarea2HLBV.model
         public DateTime Fecha { get => fecha; set => fecha = value; }
         public int Codigo { get => codigo; set => codigo = value; }
 
+        public ProductoHLBV()
+        {
+            this.nombre = "";
+            this.precioU = 0.0;
+            this.stock = 0;
+            this.fecha = DateTime.Now;
+            this.codigo = 0;
+        }
+
         public ProductoHLBV(string nombre, double precioU, int stock, DateTime fecha, int codigo)
         {
             this.nombre = nombre;
@@ -36,13 +45,11 @@ namespace Tarea2HLBV.model
 
         public virtual double Comprar(int cantidad)
         {
-            //stock += cantidad;
             return precioU * cantidad;
         }
 
         public virtual double Vender(int cantidad)
         {
-            //stock -= cantidad;
             return precioU * cantidad;
         }
     }

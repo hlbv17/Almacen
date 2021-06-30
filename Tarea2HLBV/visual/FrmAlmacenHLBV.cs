@@ -13,27 +13,45 @@ namespace Tarea2HLBV
     public partial class FrmAlmacenHLBV : Form
     {
         AdmProductoNoPerecibleHLBV admPnp = new AdmProductoNoPerecibleHLBV();
+        ValidacionHLBV v = new ValidacionHLBV();
         public FrmAlmacenHLBV()
         {
             InitializeComponent();
+            dtpFechaE.Enabled = false;
+            dtpFechaV.Enabled = false;
+            txtCodigo.Enabled = false;
+            txtPrecioU.Enabled = false;
+            txtNombre.Enabled = false;
+            txtCantidad.Enabled = false;
+        }
+
+        void HabilitarCampos()
+        {
+            dtpFechaE.Enabled = true;
+            dtpFechaV.Enabled = true;
+            txtCodigo.Enabled = true;
+            txtPrecioU.Enabled = true;
+            txtNombre.Enabled = true;
+            txtCantidad.Enabled = true;
+        }
+
+        void BloquearCampos()
+        {
+            dtpFechaE.Enabled = false;
+            dtpFechaV.Enabled = false;
+            //txtCodigo.Enabled = false;
+            txtPrecioU.Enabled = false;
         }
 
         private void cmbAccion_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cmbAccion.SelectedIndex == 0)
             {
-                dtpFechaE.Enabled = true;
-                dtpFechaV.Enabled = true;
-                txtCodigo.Enabled = true;
-                txtPrecioU.Enabled = true;
+                HabilitarCampos();
             }
             else
             {
-                admPnp.Limpiar(txtNombre, txtPrecioU, txtCantidad, txtCodigo);
-                dtpFechaE.Enabled = false;
-                dtpFechaV.Enabled = false;
-                txtCodigo.Enabled = false;
-                txtPrecioU.Enabled = false;
+                BloquearCampos();
             }
         }
 
@@ -50,7 +68,7 @@ namespace Tarea2HLBV
         private void txtPrecioU_KeyPress(object sender, KeyPressEventArgs e)
         {
             char c = e.KeyChar;
-            if (char.IsLetter(c) && c != ',' && (e.KeyChar != Convert.ToChar(Keys.Back)))
+            if (char.IsLetter(c) && c != '.' && (e.KeyChar != Convert.ToChar(Keys.Back)))
             {
                 e.Handled = true;
                 return;
@@ -71,20 +89,30 @@ namespace Tarea2HLBV
         {
             string nombre = txtNombre.Text.Trim(), precioU = txtPrecioU.Text, accion = cmbAccion.Text,
                 cantidad = txtCantidad.Text, codigo = txtCodigo.Text;
+            int iCodigo = v.AEntero(codigo);
             DateTime fechaE = dtpFechaE.Value.Date, fechaV = dtpFechaV.Value.Date, fecha = DateTime.Now;
-            if (admPnp.EsCorrecto(nombre, precioU, fecha, codigo, fechaE, fechaV, cantidad))
+            if (admPnp.EsCorrecto(nombre, precioU, codigo, fechaE, fechaV, cantidad))
             {
                 if (accion.Equals("Compra"))
                 {
-                    admPnp.guardar(nombre, precioU, fecha, codigo, fechaE, fechaV, cantidad, accion);
-                    admPnp.agregar(txtContenido);
-
+                    if (admPnp.ProductoExiste(iCodigo)){
+                        BloquearCampos();
+                        admPnp.LlenarCampos(nombre, iCodigo, txtPrecioU, txtCodigo, dtpFechaE, dtpFechaV);
+                        admPnp.Guardar(nombre, precioU, fecha, codigo, fechaE, fechaV, cantidad, accion);
+                        admPnp.Mostrar(iCodigo, txtContenido);
+                    }
+                    else if(admPnp.ListaVacia() || admPnp.NumeroRepetido(iCodigo) == false)
+                    {
+                        admPnp.Guardar(nombre, precioU, fecha, codigo, fechaE, fechaV, cantidad, accion);
+                        admPnp.Mostrar(iCodigo, txtContenido);
+                    }
                 }else if (accion.Equals("Venta"))
                 {
-                    if (admPnp.ProductoExiste(nombre))
+                    if (admPnp.ProductoExiste(iCodigo))
                     {
-                        admPnp.guardar(nombre, precioU, fecha, codigo, fechaE, fechaV, cantidad, accion);
-                        admPnp.agregar(txtContenido);
+                        admPnp.LlenarCampos(nombre, iCodigo, txtPrecioU, txtCodigo, dtpFechaE, dtpFechaV);
+                        admPnp.Guardar(nombre, precioU, fecha, codigo, fechaE, fechaV, cantidad, accion);
+                        admPnp.Mostrar(iCodigo,txtContenido);
                     }
                     else
                     {
@@ -95,9 +123,17 @@ namespace Tarea2HLBV
             }
         }
 
-        private void txtNombre_TextChanged(object sender, EventArgs e)
+        private void btnTiempoCaducidad_Click(object sender, EventArgs e)
         {
+            lblCambiar.Text = "PRODUCTO POR TIEMPO DE CADUCIDAD";
+            admPnp.MostrarTiempo(txtTiempoCaducidad);
+        }
             
+        private void btnMasCaro_Click(object sender, EventArgs e)
+        {
+            txtTiempoCaducidad.Text = "";
+            lblCambiar.Text = "PRODUCTO MÁS CARO";
+            admPnp.MostrarMasCaro(txtTiempoCaducidad);
         }
     }
 }

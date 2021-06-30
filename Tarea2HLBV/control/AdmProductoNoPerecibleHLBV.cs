@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tarea2HLBV.model;
 
@@ -12,28 +13,86 @@ namespace Tarea2HLBV.control
         List<ProductoHLBV> lista = new List<ProductoHLBV>();
         ValidacionHLBV v = new ValidacionHLBV();
         ProductoHLBV p = null;
-        //ProductoNoPerecibleHLBV pnp = null;
-
+        ProductoNoPerecibleHLBV pnp = null;
+        List<int> tiempoCaducidad = new List<int>();
 
         internal ProductoNoPerecibleHLBV MasCaro()
         {
-            return (ProductoNoPerecibleHLBV)lista.Max();
+            double n = 0.0;
+            int num = 0;
+            foreach (ProductoHLBV miProducto in lista)
+            {
+                if (miProducto.GetType() == typeof(ProductoNoPerecibleHLBV))
+                {
+                    pnp = (ProductoNoPerecibleHLBV)miProducto;
+                    pnp.PrecioU = miProducto.PrecioU;
+                    pnp.Nombre = miProducto.Nombre;
+                }
+                n = lista.Max(x => x.PrecioU);
+                num = lista.FindIndex(x => x.PrecioU == n);
+                pnp = (ProductoNoPerecibleHLBV)lista[num];
+            }
+            return pnp;
         }
 
-
-        internal List<ProductoHLBV> OrdenarXCaducacion()
+        internal void MostrarMasCaro(TextBox txtTiempoCaducidad)
         {
-            List <ProductoHLBV> ordenado = lista.OrderBy(x => x.Fecha).ToList();
-            //Console.WriteLine(String.Join(Environment.NewLine, ordenado));
-            return ordenado;
+            pnp = MasCaro();
+            txtTiempoCaducidad.Text += "\r\n"+pnp.ToString();
         }
 
-        internal bool EsCorrecto(string nombre, string precioU, DateTime fecha,
+
+        internal List<int> OrdenarXCaducacion()
+        {
+            ProductoNoPerecibleHLBV pnp = null;
+            DateTime f, fv;
+            int tiempo;
+            string mostrar, result = "";
+            foreach (ProductoHLBV miProducto in lista)
+            {
+                if (miProducto.GetType() == typeof(ProductoNoPerecibleHLBV))
+                {
+                    pnp = (ProductoNoPerecibleHLBV)miProducto;
+                    //nombre = pnp.Nombre;
+                    f = pnp.Fecha;
+                    fv = pnp.FechaV;
+                    result = pnp.TiempoCaducidad(fv, f);
+                    result = Regex.Match(result, @"\d+").Value;
+                    tiempo = Int32.Parse(result);
+                    mostrar = "\r\nCaduca en: "+tiempo+ " días \n" + miProducto;
+                    tiempoCaducidad.Add(tiempo);
+                }
+            }
+            tiempoCaducidad.Sort();
+            return tiempoCaducidad;
+        }
+
+
+        internal void MostrarTiempo(TextBox txtContenido)
+        {
+            tiempoCaducidad = OrdenarXCaducacion();
+            foreach(int tiempo in tiempoCaducidad)
+            {
+                foreach (ProductoHLBV miProducto in lista)
+                {
+                    pnp = (ProductoNoPerecibleHLBV)miProducto;
+                    if (miProducto.GetType() == typeof(ProductoNoPerecibleHLBV)
+                        && tiempo == (pnp.FechaV-pnp.Fecha).Days)
+                    {
+                        //pnp = (ProductoNoPerecibleHLBV)miProducto;
+                        txtContenido.Text += "\r\nCaduca en: " + tiempo + 
+                            " días \r\n " + miProducto + "\r\n";
+                    }
+                }
+            }
+        }
+
+        internal bool EsCorrecto(string nombre, string precioU,
             string codigo, DateTime fechaE, DateTime fechaV, string cantidad)
         {
             bool x = true;
             if (String.IsNullOrEmpty(nombre) && String.IsNullOrEmpty(precioU) && String.IsNullOrEmpty(cantidad)
-                && String.IsNullOrEmpty(codigo) && fechaE != null && fechaE != null && v.EsEntero(cantidad)
+                && String.IsNullOrEmpty(codigo) && fechaE != null && fechaV != null && v.EsEntero(cantidad)
                 && v.EsEntero(codigo) && v.EsReal(precioU))
             {
                 x = true;
@@ -42,21 +101,58 @@ namespace Tarea2HLBV.control
         }
 
         internal void Limpiar(TextBox txtNombre, TextBox txtPrecioU, TextBox txtCantidad, 
-            TextBox txtCodigo)
+            TextBox txtCodigo, DateTimePicker dtpFechaE, DateTimePicker dtpFechaV)
         {
             txtNombre.Text = "";
             txtPrecioU.Text = "";
             txtCantidad.Text = "";
             txtCodigo.Text = "";
-
+            dtpFechaE.Value = DateTime.Now;
+            dtpFechaV.Value = DateTime.Now;
         }
 
-        internal bool ProductoExiste(string nombre)
+        internal int Compra(int iCantidad, int indice)
+        {
+            int stock = lista[indice].Stock;
+            stock -= iCantidad;
+            return stock;
+        }
+
+        internal int Vende(int iCantidad, int indice)
+        {
+            int stock = lista[indice].Stock;
+            if (iCantidad > stock)
+            {
+                MessageBox.Show("Error: No hay esa cantidad disponible en stock");
+            }
+            else
+            {
+                stock -= iCantidad;
+            }
+            return stock;
+        }
+
+        internal int IndexProductoExiste(int codigo)
+        {
+            int n = 0;
+            try
+            {
+                n = lista.FindIndex(x => x.Codigo == codigo);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                MessageBox.Show("Error: El producto no existe en stock");
+            }
+            return n;
+        }
+
+        internal bool ProductoExiste(int codigo)
         {
             bool flag = true;
             try
             {
-                flag = lista.Any(x => x.Nombre == nombre);
+                flag = lista.Any(x => x.Codigo == codigo);
             }
             catch (Exception e)
             {
@@ -67,95 +163,87 @@ namespace Tarea2HLBV.control
             return flag;
         }
 
-        internal int IndexProductoExiste(string nombre)
+        internal bool ListaVacia()
         {
-            int n = 0;
-            try
+            bool flag = true;
+            if (lista.Count == 0)
             {
-                n = lista.FindIndex(x => x.Nombre == nombre);
+                flag = true;
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.Message);
-                MessageBox.Show("Error: El producto no existe en stock");
+                flag = false;
             }
-            return n;
+            return flag;
         }
 
-        internal int Compra(int iCantidad, int indice)
+        internal bool NumeroRepetido(int codigo)
         {
-            int stock = lista[indice].Stock;
-            stock += iCantidad;
-            return stock;
+            bool flag = false;
+            if (lista.Any(x => x.Codigo == codigo))
+            {
+                MessageBox.Show("Error: el código debe ser único");
+                flag = true;
+            }
+            return flag;
         }
 
-        internal int Vende(int iCantidad, int indice)
-        {
-            int stock = lista[indice].Stock;
-            stock -= iCantidad;
-            return stock;
-        }
-
-        internal void guardar(string nombre, string precioU, DateTime fecha,
+        internal void Guardar(string nombre, string precioU, DateTime fecha,
             string codigo, DateTime fechaE, DateTime fechaV, string cantidad, string accion)
         {
-            ProductoNoPerecibleHLBV pnp = null;
-            double dPrecioU = v.AReal(precioU);
-            int iCantidad = v.AEntero(cantidad);
-            int iCodigo = v.AEntero(codigo);
-            int stock = 0, indice = 0;
-            if(accion.Equals("Compra"))
+            //ProductoNoPerecibleHLBV pnp = null;
+            int stock = 0, indice = 0, iCantidad = v.AEntero(cantidad), iCodigo = v.AEntero(codigo);
+            if (accion.Equals("Compra"))
             {
-                if (ProductoExiste(nombre))
+                double dPrecioU = v.AReal(precioU);
+                if (lista.Any(x => x.Codigo == iCodigo) && lista.Any(x => x.Nombre == nombre))
                 {
-                    indice = IndexProductoExiste(nombre);
+                    indice = IndexProductoExiste(iCodigo);
                     stock = Compra(iCantidad, indice);
-                    pnp = new ProductoNoPerecibleHLBV(fechaE, fechaV, nombre, dPrecioU, stock, fecha, iCodigo);
-                    lista.Add(pnp);
+                    lista[indice].Stock = stock;
                 }
-                else
+                else if(ListaVacia() || NumeroRepetido(iCodigo) == false)
                 {
                     stock = iCantidad;
                     pnp = new ProductoNoPerecibleHLBV(fechaE, fechaV, nombre, dPrecioU, stock, fecha, iCodigo);
                     lista.Add(pnp);
-                    
                 }
             }
             else if(accion.Equals("Venta"))
             {
-                if (ProductoExiste(nombre))
+                if (ProductoExiste(iCodigo) && lista.Any(x => x.Nombre == nombre))
                 {
-                    indice = IndexProductoExiste(nombre);
+                    indice = IndexProductoExiste(iCodigo);
                     stock = Vende(iCantidad, indice);
-                    pnp = new ProductoNoPerecibleHLBV(fechaE, fechaV, nombre, dPrecioU, stock, fecha, iCodigo);
-                    lista.Add(pnp);
-                }
-                else
-                {
-                    MessageBox.Show("Error: No existe ese producto");
+                    //ProductoNoPerecibleHLBV pnp = (ProductoNoPerecibleHLBV)p;
+                    lista[indice].Stock = stock;
                 }
             }
         }
 
-        internal void agregar(TextBox txtContenido)
+        internal void Mostrar(int codigo, TextBox txtContenido)
         {
-            txtContenido.Text += "\r\n" +lista[lista.Count - 1].ToString();
+            int indice = IndexProductoExiste(codigo);
+            txtContenido.Text += "\r\n" + lista[indice].ToString();
         }
 
-
-        internal void Buscar(string nombre, TextBox txtPrecioU, TextBox txtCodigo, 
-            DateTime dtpFechaE, DateTime dtpFechaV)
+        internal void LlenarCampos(string nombre, int codigo, TextBox txtPrecioU, 
+            TextBox txtCodigo, DateTimePicker dtpFechaE, DateTimePicker dtpFechaV)
         {
-            string valores;
-            int indice = 0;
-            if (ProductoExiste(nombre))
+            //ProductoHLBV p = new ProductoNoPerecibleHLBV(); //Up-casting.
+            //ProductoNoPerecibleHLBV pnp = (ProductoNoPerecibleHLBV)p;  //Down-casting.
+            foreach (ProductoHLBV miProducto in lista)
             {
-                indice = IndexProductoExiste(nombre);
-                txtPrecioU.Text = lista[indice].PrecioU.ToString();
-                txtCodigo.Text = lista[indice].Codigo.ToString();
-                //dtpFechaE.Value = lista[indice].Fecha.ToString();
-            }
-            
+                if (miProducto.GetType() == typeof(ProductoNoPerecibleHLBV) && ProductoExiste(codigo)
+                    && lista.Any(x => x.Nombre == nombre))
+                {
+                    pnp = (ProductoNoPerecibleHLBV)miProducto;
+                    txtPrecioU.Text = pnp.PrecioU.ToString();
+                    //txtCodigo.Text = pnp.Codigo.ToString();
+                    dtpFechaE.Value = pnp.FechaE;
+                    dtpFechaV.Value = pnp.FechaV;   
+                }
+            }    
         }
     }
 }

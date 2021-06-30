@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tarea2HLBV.model;
 
 namespace Tarea2HLBV.control
 {
+
     class ValidacionHLBV
     {
         internal bool EsReal(string valor)
@@ -67,7 +69,7 @@ namespace Tarea2HLBV.control
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                MessageBox.Show("Error: se esperaba un número entero");
+                MessageBox.Show("Error: se esperaba un número real");
             }
             return x;
         }
@@ -82,7 +84,7 @@ namespace Tarea2HLBV.control
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                MessageBox.Show("Error: se esperaba un número entero");
+                MessageBox.Show("Error: se esperaba una fecha");
             }
             return x;
         }
@@ -97,10 +99,11 @@ namespace Tarea2HLBV.control
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                MessageBox.Show("Error: se esperaba un número entero");
+                MessageBox.Show("Error: se esperaba una cadena");
             }
             return x;
         }
+
 
     }
 }

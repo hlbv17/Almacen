@@ -13,6 +13,14 @@ namespace Tarea2HLBV.model
         public DateTime FechaE { get => fechaE; set => fechaE = value; }
         public DateTime FechaV { get => fechaV; set => fechaV = value; }
 
+        public ProductoNoPerecibleHLBV() : base()
+        {
+
+            FechaE = DateTime.Now;
+            FechaV = DateTime.Now;
+        }
+
+
         public ProductoNoPerecibleHLBV(DateTime fechaE, DateTime fechaV, string nombre,
             double precioU, int stock, DateTime fecha, int codigo) : base(nombre, 
                 precioU, stock, fecha, codigo)
@@ -37,11 +45,10 @@ namespace Tarea2HLBV.model
             return base.Vender(cantidad);
         }
 
-        public string TiempoCaducidad(DateTime fechaE, DateTime fechaV)
+        public string TiempoCaducidad(DateTime fechaV, DateTime fecha)
         {
-            TimeSpan diferencia = fechaV - fechaE;
-            int dias = diferencia.Days;
-            return "\nCaduce en: "+dias.ToString();
+            int dias = (fechaV - fecha).Days;
+            return "\nCaduca en: "+dias+ "\n";
         }
     }
 }

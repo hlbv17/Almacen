@@ -46,7 +46,7 @@ namespace Tarea2HLBV
             this.label6 = new System.Windows.Forms.Label();
             this.txtCodigo = new System.Windows.Forms.TextBox();
             this.txtTiempoCaducidad = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
+            this.lblCambiar = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.dtpFechaV = new System.Windows.Forms.DateTimePicker();
@@ -120,6 +120,7 @@ namespace Tarea2HLBV
             this.btnMasCaro.TabIndex = 6;
             this.btnMasCaro.Text = "Producto más caro";
             this.btnMasCaro.UseVisualStyleBackColor = true;
+            this.btnMasCaro.Click += new System.EventHandler(this.btnMasCaro_Click);
             // 
             // btnTiempoCaducidad
             // 
@@ -129,6 +130,7 @@ namespace Tarea2HLBV
             this.btnTiempoCaducidad.TabIndex = 7;
             this.btnTiempoCaducidad.Text = "Tiempo de Caducidad";
             this.btnTiempoCaducidad.UseVisualStyleBackColor = true;
+            this.btnTiempoCaducidad.Click += new System.EventHandler(this.btnTiempoCaducidad_Click);
             // 
             // label3
             // 
@@ -146,7 +148,6 @@ namespace Tarea2HLBV
             this.txtNombre.Name = "txtNombre";
             this.txtNombre.Size = new System.Drawing.Size(118, 20);
             this.txtNombre.TabIndex = 9;
-            this.txtNombre.TextChanged += new System.EventHandler(this.txtNombre_TextChanged);
             this.txtNombre.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNombre_KeyPress);
             // 
             // label4
@@ -161,7 +162,7 @@ namespace Tarea2HLBV
             // txtPrecioU
             // 
             this.txtPrecioU.Location = new System.Drawing.Point(148, 103);
-            this.txtPrecioU.MaxLength = 9;
+            this.txtPrecioU.MaxLength = 10;
             this.txtPrecioU.Name = "txtPrecioU";
             this.txtPrecioU.Size = new System.Drawing.Size(118, 20);
             this.txtPrecioU.TabIndex = 11;
@@ -180,7 +181,7 @@ namespace Tarea2HLBV
             // 
             this.dtpFechaE.Location = new System.Drawing.Point(148, 216);
             this.dtpFechaE.Name = "dtpFechaE";
-            this.dtpFechaE.Size = new System.Drawing.Size(191, 20);
+            this.dtpFechaE.Size = new System.Drawing.Size(120, 20);
             this.dtpFechaE.TabIndex = 13;
             // 
             // label6
@@ -211,14 +212,14 @@ namespace Tarea2HLBV
             this.txtTiempoCaducidad.Size = new System.Drawing.Size(300, 208);
             this.txtTiempoCaducidad.TabIndex = 16;
             // 
-            // label7
+            // lblCambiar
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(392, 271);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(229, 13);
-            this.label7.TabIndex = 17;
-            this.label7.Text = "PRODUCTOS POR TIEMPO DE CADUCIDAD";
+            this.lblCambiar.AutoSize = true;
+            this.lblCambiar.Location = new System.Drawing.Point(358, 270);
+            this.lblCambiar.Name = "lblCambiar";
+            this.lblCambiar.Size = new System.Drawing.Size(103, 13);
+            this.lblCambiar.TabIndex = 17;
+            this.lblCambiar.Text = "________________";
             // 
             // label8
             // 
@@ -242,7 +243,7 @@ namespace Tarea2HLBV
             // 
             this.dtpFechaV.Location = new System.Drawing.Point(149, 254);
             this.dtpFechaV.Name = "dtpFechaV";
-            this.dtpFechaV.Size = new System.Drawing.Size(191, 20);
+            this.dtpFechaV.Size = new System.Drawing.Size(119, 20);
             this.dtpFechaV.TabIndex = 20;
             // 
             // FrmAlmacenHLBV
@@ -253,7 +254,7 @@ namespace Tarea2HLBV
             this.Controls.Add(this.dtpFechaV);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.label7);
+            this.Controls.Add(this.lblCambiar);
             this.Controls.Add(this.txtTiempoCaducidad);
             this.Controls.Add(this.txtCodigo);
             this.Controls.Add(this.label6);
@@ -297,7 +298,7 @@ namespace Tarea2HLBV
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtCodigo;
         private System.Windows.Forms.TextBox txtTiempoCaducidad;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label lblCambiar;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DateTimePicker dtpFechaV;
