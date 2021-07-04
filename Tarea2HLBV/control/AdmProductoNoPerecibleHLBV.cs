@@ -20,18 +20,9 @@ namespace Tarea2HLBV.control
         {
             double n = 0.0;
             int num = 0;
-            foreach (ProductoHLBV miProducto in lista)
-            {
-                if (miProducto.GetType() == typeof(ProductoNoPerecibleHLBV))
-                {
-                    pnp = (ProductoNoPerecibleHLBV)miProducto;
-                    pnp.PrecioU = miProducto.PrecioU;
-                    pnp.Nombre = miProducto.Nombre;
-                }
-                n = lista.Max(x => x.PrecioU);
-                num = lista.FindIndex(x => x.PrecioU == n);
-                pnp = (ProductoNoPerecibleHLBV)lista[num];
-            }
+            n = lista.Max(x => x.PrecioU);
+            num = lista.FindIndex(x => x.PrecioU == n);
+            pnp = (ProductoNoPerecibleHLBV)lista[num];
             return pnp;
         }
 
@@ -59,7 +50,7 @@ namespace Tarea2HLBV.control
                     result = pnp.TiempoCaducidad(fv, f);
                     result = Regex.Match(result, @"\d+").Value;
                     tiempo = Int32.Parse(result);
-                    mostrar = "\r\nCaduca en: "+tiempo+ " días \n" + miProducto;
+                    mostrar = "\r\nCaduca en: "+tiempo+ " días " + miProducto;
                     tiempoCaducidad.Add(tiempo);
                 }
             }
@@ -114,7 +105,7 @@ namespace Tarea2HLBV.control
         internal int Compra(int iCantidad, int indice)
         {
             int stock = lista[indice].Stock;
-            stock -= iCantidad;
+            stock += iCantidad;
             return stock;
         }
 
@@ -191,7 +182,6 @@ namespace Tarea2HLBV.control
         internal void Guardar(string nombre, string precioU, DateTime fecha,
             string codigo, DateTime fechaE, DateTime fechaV, string cantidad, string accion)
         {
-            //ProductoNoPerecibleHLBV pnp = null;
             int stock = 0, indice = 0, iCantidad = v.AEntero(cantidad), iCodigo = v.AEntero(codigo);
             if (accion.Equals("Compra"))
             {
@@ -202,7 +192,7 @@ namespace Tarea2HLBV.control
                     stock = Compra(iCantidad, indice);
                     lista[indice].Stock = stock;
                 }
-                else if(ListaVacia() || NumeroRepetido(iCodigo) == false)
+                else if(ListaVacia() && v.FechaVigente(fechaV) || NumeroRepetido(iCodigo) == false )
                 {
                     stock = iCantidad;
                     pnp = new ProductoNoPerecibleHLBV(fechaE, fechaV, nombre, dPrecioU, stock, fecha, iCodigo);
@@ -215,7 +205,6 @@ namespace Tarea2HLBV.control
                 {
                     indice = IndexProductoExiste(iCodigo);
                     stock = Vende(iCantidad, indice);
-                    //ProductoNoPerecibleHLBV pnp = (ProductoNoPerecibleHLBV)p;
                     lista[indice].Stock = stock;
                 }
             }

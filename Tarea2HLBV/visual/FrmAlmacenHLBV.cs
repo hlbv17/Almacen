@@ -125,6 +125,7 @@ namespace Tarea2HLBV
 
         private void btnTiempoCaducidad_Click(object sender, EventArgs e)
         {
+            txtTiempoCaducidad.Text = "";
             lblCambiar.Text = "PRODUCTO POR TIEMPO DE CADUCIDAD";
             admPnp.MostrarTiempo(txtTiempoCaducidad);
         }

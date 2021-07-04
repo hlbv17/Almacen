@@ -273,7 +273,7 @@ namespace Tarea2HLBV
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Name = "FrmAlmacenHLBV";
-            this.Text = "Form1";
+            this.Text = "Helen Lisbeth Bernal Vera";
             this.ResumeLayout(false);
             this.PerformLayout();
 

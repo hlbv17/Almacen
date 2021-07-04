@@ -74,36 +74,22 @@ namespace Tarea2HLBV.control
             return x;
         }
 
-        internal DateTime ADate(string valor)
+        internal bool FechaVigente(DateTime fechaV)
         {
-            DateTime x = DateTime.Now;
+            DateTime fecha = DateTime.Now;
+            bool flag = true;
             try
             {
-                x = Convert.ToDateTime(valor);
+                if (fechaV > fecha)
+                    flag = true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                MessageBox.Show("Error: se esperaba una fecha");
+                MessageBox.Show("Error: La fecha de vencimiento no es válida");
+                flag = false;
             }
-            return x;
+            return flag;
         }
-
-        internal string ACadena(DateTime valor)
-        {
-            string x = "";
-            try
-            {
-                x = Convert.ToString(valor);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                MessageBox.Show("Error: se esperaba una cadena");
-            }
-            return x;
-        }
-
-
     }
 }
